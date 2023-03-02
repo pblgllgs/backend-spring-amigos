@@ -15,7 +15,6 @@
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>15</java.version>
-		<image>pblgllgs/amigos-${project.artifactId}-react-spring:${project.version}</image>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -75,6 +74,7 @@
 								</platforms>
 							</from>
 							<to>
+								<image>pblgllgs/amigos-${project.artifactId}-react-spring:${project.version}</image>
 								<tags>
 									<tag>latest</tag>
 								</tags>
