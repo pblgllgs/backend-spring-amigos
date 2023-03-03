@@ -1,0 +1,8 @@
+version: "3.8"
+
+services:
+  backend:
+    image: pblgllgs/amigos-demo-react-spring:latest
+    ports:
+      - "80:8080"
+    restart: always
