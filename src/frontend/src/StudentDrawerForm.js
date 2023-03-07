@@ -1,25 +1,44 @@
-import { Button, Col, Drawer, Form, Input, Row, Select } from "antd";
+import { Button, Col, Drawer, Form, Input, Row, Select, Spin, notification } from "antd";
 import { addNewStudent } from "./client";
+import { LoadingOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import { successNotification } from "./notification";
 const { Option } = Select;
 
-function StudentDrawerForm({ showDrawer, setShowDrawer }) {
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+
+function StudentDrawerForm({ showDrawer, setShowDrawer, fetchStudents }) {
   const onClose = () => setShowDrawer(false);
+  const [subMitting, setSubMitting] = useState(false);
   const onFinish = (student) => {
+    setSubMitting(true);
     console.log(JSON.stringify(student, null, 2));
     addNewStudent(student)
       .then(() => {
         console.log("student added");
-        setShowDrawer(false);
+        onClose();
+        successNotification(
+          "Student added successfully",
+          `${student.name} was added`
+        );
+        fetchStudents();
       })
       .catch((err) => {
+        setSubMitting(false);
         console.log(err);
+      })
+      .finally(() => {
+        setSubMitting(false);
       });
   };
+
   const onFinishFailed = (errorInfo) => {
     alert(JSON.stringify(errorInfo, null, 2));
   };
+
   return (
     <>
+      {/* {contextHolder} */}
       <Drawer
         title="Create a new student"
         width={720}
@@ -91,7 +110,7 @@ function StudentDrawerForm({ showDrawer, setShowDrawer }) {
               >
                 <Select placeholder="Please select a gender">
                   <Option value="MALE">Male</Option>
-                  <Option value="FEMALE">FeMale</Option>
+                  <Option value="FEMALE">Female</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -110,6 +129,7 @@ function StudentDrawerForm({ showDrawer, setShowDrawer }) {
               </Form.Item>
             </Col>
           </Row>
+          <Row>{subMitting && <Spin indicator={antIcon} />}</Row>
         </Form>
       </Drawer>
     </>

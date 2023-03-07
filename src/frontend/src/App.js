@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { getAllStudents } from "./client";
-import { Breadcrumb, Button, Empty, Layout, Menu, Spin, Table } from "antd";
+import { Badge, Breadcrumb, Button, Empty, Layout, Menu, Spin, Table, Tag } from "antd";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -27,6 +27,7 @@ const columns = [
     title: "Id",
     dataIndex: "id",
     key: "id",
+    sortDirections: ['descend'],
   },
   {
     title: "Name",
@@ -69,7 +70,6 @@ function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [showDrawer, setShowDrawer] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [size, setSize] = useState("large");
 
   const fetchStudents = async () => {
@@ -98,21 +98,33 @@ function App() {
     }
     return (
       <>
-        <StudentDrawerForm setShowDrawer={setShowDrawer} showDrawer={showDrawer} />
+        <StudentDrawerForm
+          setShowDrawer={setShowDrawer}
+          showDrawer={showDrawer}
+          fetchStudents={fetchStudents}
+        />
         <Table
           dataSource={students}
           columns={columns}
           bordered
+          sortDirections={['ascend' | 'descend']}
           title={() => (
-            <Button
-              onClick={() => setShowDrawer(!showDrawer)}
-              type="primary"
-              shape="round"
-              icon={<PlusOutlined />}
-              size={size}
-            >
-              Add new student
-            </Button>
+            <>
+              <Button
+                onClick={() => setShowDrawer(!showDrawer)}
+                type="primary"
+                shape="round"
+                icon={<PlusOutlined />}
+                size={size}
+                style={{marginRight: "10px"}}
+              >
+                Add new student
+              </Button>
+              <Tag>
+                Number of students
+              </Tag>
+              <Badge count={students.length} showZero color="#faad14" />
+            </>
           )}
           footer={() => "Users in the system"}
           pagination={{ pageSize: 50 }}
