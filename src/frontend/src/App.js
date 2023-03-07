@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { getAllStudents } from "./client";
-import { Breadcrumb, Empty, Layout, Menu, Spin, Table } from "antd";
+import { Breadcrumb, Button, Empty, Layout, Menu, Spin, Table } from "antd";
 import {
   DesktopOutlined,
   FileOutlined,
   LoadingOutlined,
   PieChartOutlined,
+  PlusOutlined,
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import StudentDrawerForm from "./StudentDrawerForm";
 
 function getItem(label, key, icon, children) {
   return {
@@ -66,6 +68,9 @@ function App() {
   const [students, setStudents] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [showDrawer, setShowDrawer] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [size, setSize] = useState("large");
 
   const fetchStudents = async () => {
     getAllStudents()
@@ -74,9 +79,8 @@ function App() {
         console.log(data);
         setStudents(data);
         setTimeout(() => {
-          setFetching(false)
-          
-        },250)
+          setFetching(false);
+        }, 250);
       });
   };
 
@@ -86,23 +90,36 @@ function App() {
   }, []);
 
   const renderStudents = () => {
-    if(fetching){
-      return  <Spin indicator={antIcon} />
+    if (fetching) {
+      return <Spin indicator={antIcon} />;
     }
     if (students.length <= 0) {
       return <Empty />;
     }
     return (
-      <Table
-        dataSource={students}
-        columns={columns}
-        bordered
-        title={() => "Users"}
-        footer={() => "Users in the system"}
-        pagination={{ pageSize: 50 }}
-        scroll={{ y: 240 }}
-        rowKey={(student) => student.id}
-      />
+      <>
+        <StudentDrawerForm setShowDrawer={setShowDrawer} showDrawer={showDrawer} />
+        <Table
+          dataSource={students}
+          columns={columns}
+          bordered
+          title={() => (
+            <Button
+              onClick={() => setShowDrawer(!showDrawer)}
+              type="primary"
+              shape="round"
+              icon={<PlusOutlined />}
+              size={size}
+            >
+              Add new student
+            </Button>
+          )}
+          footer={() => "Users in the system"}
+          pagination={{ pageSize: 50 }}
+          scroll={{ y: 500 }}
+          rowKey={(student) => student.id}
+        />
+      </>
     );
   };
 
@@ -160,7 +177,7 @@ function App() {
             textAlign: "center",
           }}
         >
-          Ant Design ©2018 Created by Ant UED
+          Ant Design ©2023 Created by pblgllgs
         </Footer>
       </Layout>
     </Layout>

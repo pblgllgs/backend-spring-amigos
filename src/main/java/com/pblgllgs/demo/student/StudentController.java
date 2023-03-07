@@ -1,34 +1,26 @@
 package com.pblgllgs.demo.student;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
 
 @RestController
 @RequestMapping(path="/api/v1/students")
+@AllArgsConstructor
 public class StudentController {
 
-    @GetMapping()
+    private final StudentService studentService;
+
+    @GetMapping
     public List<Student> getAllStudent(){
-        List<Student> students = Arrays.asList(
-                new Student(
-                        1L,
-                        "user",
-                        "user@gmail.com",
-                        Gender.MALE
+        return studentService.getAllStudents();
+    }
 
-                ),
-                new Student(
-                        2L,
-                        "admin",
-                        "admin@gmail.com",
-                        Gender.FEMALE
-
-                )
-        );
-        return students;
+    @PostMapping
+    public void addStudent(@RequestBody Student student){
+        //TODO: check if email exist
+        studentService.addStudent(student);
     }
 }
