@@ -155,7 +155,7 @@ function App() {
         err.response.json().then((res) => {
           errorNotification(
             "There was an issue",
-            `${res.message} fetching ${res.path} with code [${res.status}][${res.error}]`,
+            `${res.message} fetching ${res.path} with code [${res.status}][${res.error}]`
           );
         });
       })
@@ -173,7 +173,26 @@ function App() {
       return <Spin indicator={antIcon} />;
     }
     if (students.length <= 0) {
-      return <Empty />;
+      return (
+        <>
+          <StudentDrawerForm
+            setShowDrawer={setShowDrawer}
+            showDrawer={showDrawer}
+            fetchStudents={fetchStudents}
+          />
+          <Button
+            onClick={() => setShowDrawer(!showDrawer)}
+            type="primary"
+            shape="round"
+            icon={<PlusOutlined />}
+            size={size}
+            style={{ marginRight: "10px" }}
+          >
+            Add new student
+          </Button>
+          <Empty />
+        </>
+      );
     }
     return (
       <>

@@ -117,6 +117,7 @@ function StudentDrawerForm({ showDrawer, setShowDrawer, fetchStudents }) {
                 <Select placeholder="Please select a gender">
                   <Option value="MALE">Male</Option>
                   <Option value="FEMALE">Female</Option>
+                  <Option value="OTHER">Other</Option>
                 </Select>
               </Form.Item>
             </Col>
