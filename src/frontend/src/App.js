@@ -1,7 +1,20 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { getAllStudents } from "./client";
-import { Badge, Breadcrumb, Button, Empty, Layout, Menu, Spin, Table, Tag } from "antd";
+import { deleteStudent, getAllStudents } from "./client";
+import {
+  Avatar,
+  Badge,
+  Breadcrumb,
+  Button,
+  Empty,
+  Layout,
+  Menu,
+  Popconfirm,
+  Radio,
+  Spin,
+  Table,
+  Tag,
+} from "antd";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -12,6 +25,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import StudentDrawerForm from "./StudentDrawerForm";
+import { errorNotification, successNotification } from "./notification";
 
 function getItem(label, key, icon, children) {
   return {
@@ -22,12 +36,48 @@ function getItem(label, key, icon, children) {
   };
 }
 
-const columns = [
+const TheAvatar = ({ name }) => {
+  let trim = name.trim();
+  if (trim.length === 0) {
+    return <Avatar icon={<UserOutlined />} />;
+  }
+  const split = trim.split(" ");
+  if (split.length === 1) {
+    return <Avatar>{name.charAt(0)}</Avatar>;
+  }
+  return <Avatar>{`${name.charAt(0)}${name.charAt(name.length - 1)}`}</Avatar>;
+};
+
+const removeStudent = (studentId, callback) => {
+  deleteStudent(studentId)
+    .then(() => {
+      successNotification("Student Deleted", `Student ${studentId} deleted`);
+      callback();
+    })
+    .catch((err) => {
+      err.response.json().then((res) => {
+        errorNotification(
+          "There was an issue",
+          `${res.message}[${res.status}][${res.error}]`
+        );
+      });
+    });
+};
+
+const columns = (fetchStudents) => [
+  {
+    title: "Image",
+    dataIndex: "avatar",
+    key: "avatar",
+    render: (text, student) => {
+      return <TheAvatar name={student.name} />;
+    },
+  },
   {
     title: "Id",
     dataIndex: "id",
     key: "id",
-    sortDirections: ['descend'],
+    sortDirections: ["descend"],
   },
   {
     title: "Name",
@@ -43,6 +93,26 @@ const columns = [
     title: "Gender",
     dataIndex: "gender",
     key: "gender",
+  },
+  {
+    title: "Actions",
+    key: "actions",
+    render: (text, student) => {
+      return (
+        <Radio.Group>
+          <Popconfirm
+            placement="topRight"
+            title={`Are you shure to delete ${student.name}`}
+            onConfirm={() => removeStudent(student.id, fetchStudents)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Radio.Button value="small">Delete</Radio.Button>
+          </Popconfirm>
+          <Radio.Button value="small">Edit</Radio.Button>
+        </Radio.Group>
+      );
+    },
   },
 ];
 
@@ -76,16 +146,25 @@ function App() {
     getAllStudents()
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setStudents(data);
         setTimeout(() => {
           setFetching(false);
         }, 250);
+      })
+      .catch((err) => {
+        err.response.json().then((res) => {
+          errorNotification(
+            "There was an issue",
+            `${res.message} fetching ${res.path} with code [${res.status}][${res.error}]`,
+          );
+        });
+      })
+      .finally(() => {
+        return setFetching(false);
       });
   };
 
   useEffect(() => {
-    console.log("component is mounted");
     fetchStudents();
   }, []);
 
@@ -105,9 +184,9 @@ function App() {
         />
         <Table
           dataSource={students}
-          columns={columns}
+          columns={columns(fetchStudents)}
           bordered
-          sortDirections={['ascend' | 'descend']}
+          sortDirections={["ascend" | "descend"]}
           title={() => (
             <>
               <Button
@@ -116,13 +195,11 @@ function App() {
                 shape="round"
                 icon={<PlusOutlined />}
                 size={size}
-                style={{marginRight: "10px"}}
+                style={{ marginRight: "10px" }}
               >
                 Add new student
               </Button>
-              <Tag>
-                Number of students
-              </Tag>
+              <Tag>Number of students</Tag>
               <Badge count={students.length} showZero color="#faad14" />
             </>
           )}

@@ -3,7 +3,6 @@ package com.pblgllgs.demo.student;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -12,6 +11,7 @@ import java.util.List;
 public class StudentController {
 
     private final StudentService studentService;
+    private final StudentRepository studentRepository;
 
     @GetMapping
     public List<Student> getAllStudent(){
@@ -20,7 +20,11 @@ public class StudentController {
 
     @PostMapping
     public void addStudent(@RequestBody Student student){
-        //TODO: check if email exist
         studentService.addStudent(student);
+    }
+
+    @DeleteMapping("/{studentId}")
+    public void deleteStudent(@PathVariable("studentId") Long studentId){
+        studentService.deleteStudent(studentId);
     }
 }

@@ -1,34 +1,41 @@
-import { Button, Col, Drawer, Form, Input, Row, Select, Spin, notification } from "antd";
+import { Button, Col, Drawer, Form, Input, Row, Select, Spin } from "antd";
 import { addNewStudent } from "./client";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { successNotification } from "./notification";
+import { errorNotification, successNotification } from "./notification";
 const { Option } = Select;
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 function StudentDrawerForm({ showDrawer, setShowDrawer, fetchStudents }) {
   const onClose = () => setShowDrawer(false);
-  const [subMitting, setSubMitting] = useState(false);
+  const [subMitting, setSubmitting] = useState(false);
   const onFinish = (student) => {
-    setSubMitting(true);
+    setSubmitting(true);
     console.log(JSON.stringify(student, null, 2));
     addNewStudent(student)
       .then(() => {
         console.log("student added");
         onClose();
         successNotification(
-          "Student added successfully",
-          `${student.name} was added`
+          "Student successfully added",
+          `${student.name} was added to the system`
         );
         fetchStudents();
       })
       .catch((err) => {
-        setSubMitting(false);
         console.log(err);
+        err.response.json().then((res) => {
+          console.log(res);
+          errorNotification(
+            "There was an issue",
+            `${res.message} [${res.status}] [${res.error}]`,
+            "bottomLeft"
+          );
+        });
       })
       .finally(() => {
-        setSubMitting(false);
+        setSubmitting(false);
       });
   };
 
@@ -38,7 +45,6 @@ function StudentDrawerForm({ showDrawer, setShowDrawer, fetchStudents }) {
 
   return (
     <>
-      {/* {contextHolder} */}
       <Drawer
         title="Create a new student"
         width={720}
